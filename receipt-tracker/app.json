@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Receipt Tracker",
+    "slug": "receipt-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "receipttracker",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.receipttracker.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to capture photos of your receipts",
+        "NSPhotoLibraryUsageDescription": "Used to select receipt images from your photo library",
+        "UIFileSharingEnabled": true,
+        "LSSupportsOpeningDocumentsInPlace": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE"
+      }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Used to capture photos of your receipts"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Used to select receipt images from your photo library"
+        }
+      ],
+      "expo-sqlite",
+      "expo-secure-store"
+    ]
+  }
+}
