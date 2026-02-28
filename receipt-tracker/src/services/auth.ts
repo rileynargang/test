@@ -33,12 +33,15 @@ export function getGoogleClientId(): string {
 }
 
 export function useGoogleAuthRequest() {
-  const redirectUri = 'https://auth.expo.io/@rileynargang/receipt-tracker';
+  const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? '';
+  // Derive the reverse-client-ID scheme Google uses for iOS OAuth clients
+  const reversedClientId = clientId.replace('.apps.googleusercontent.com', '');
+  const redirectUri = `com.googleusercontent.apps.${reversedClientId}:/oauthredirect`;
   const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? '',
+      clientId,
       scopes: SCOPES,
       redirectUri,
       responseType: AuthSession.ResponseType.Code,
