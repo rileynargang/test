@@ -9,7 +9,6 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import * as Sharing from 'expo-sharing';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -17,7 +16,7 @@ import { format } from 'date-fns';
 
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { getReceiptById, deleteReceipt, updateReceipt } from '../services/database';
-import { deleteReceiptImages, copyToCacheForSharing } from '../services/fileStorage';
+import { deleteReceiptImages, saveReceiptToFilesApp } from '../services/fileStorage';
 import { uploadReceiptToDrive } from '../services/googleDrive';
 import { getValidAccessToken } from '../services/auth';
 import { Receipt, CATEGORIES, formatAmount } from '../types';
@@ -38,20 +37,16 @@ export default function ReceiptDetailScreen({ route, navigation }: Props) {
     setReceipt(r);
   }
 
-  async function handleShare() {
+  async function handleSaveToFiles() {
     if (!receipt) return;
     try {
-      const sharePath = await copyToCacheForSharing(
-        receipt.imageUri,
-        `receipt_${receipt.id}.jpg`
+      await saveReceiptToFilesApp(receipt);
+      Alert.alert(
+        'Saved to Files',
+        'Find it in Files → On My iPhone → Receipt Tracker → Receipts'
       );
-      await Sharing.shareAsync(sharePath, {
-        mimeType: 'image/jpeg',
-        dialogTitle: `Receipt from ${receipt.merchant}`,
-        UTI: 'public.jpeg',
-      });
     } catch {
-      Alert.alert('Error', 'Unable to share this receipt.');
+      Alert.alert('Error', 'Unable to save receipt to Files.');
     }
   }
 
@@ -164,8 +159,8 @@ export default function ReceiptDetailScreen({ route, navigation }: Props) {
 
       {/* Actions */}
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <Ionicons name="share-outline" size={22} color="#2196F3" />
+        <TouchableOpacity style={styles.actionButton} onPress={handleSaveToFiles}>
+          <Ionicons name="folder-outline" size={22} color="#2196F3" />
           <Text style={styles.actionLabel}>Save to Files</Text>
         </TouchableOpacity>
 

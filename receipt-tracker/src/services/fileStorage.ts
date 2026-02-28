@@ -62,3 +62,39 @@ export async function writeCsvToCache(csv: string, filename: string): Promise<st
   await FileSystem.writeAsStringAsync(dest, csv, { encoding: FileSystem.EncodingType.UTF8 });
   return dest;
 }
+
+function sanitizeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').slice(0, 30);
+}
+
+async function ensureDir(dir: string): Promise<void> {
+  const info = await FileSystem.getInfoAsync(dir);
+  if (!info.exists) {
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+  }
+}
+
+// Saves receipt image to documentDirectory/Receipts/{Merchant}_{Date}.jpg
+// Visible in iOS Files → On My iPhone → Receipt Tracker → Receipts
+export async function saveReceiptToFilesApp(receipt: {
+  imageUri: string;
+  merchant: string;
+  date: string;
+}): Promise<string> {
+  const dir = `${FileSystem.documentDirectory}Receipts/`;
+  await ensureDir(dir);
+  const name = `${sanitizeFilename(receipt.merchant || 'Receipt')}_${receipt.date}.jpg`;
+  const dest = `${dir}${name}`;
+  await FileSystem.copyAsync({ from: receipt.imageUri, to: dest });
+  return dest;
+}
+
+// Saves CSV to documentDirectory/Exports/receipts_{date}.csv
+// Visible in iOS Files → On My iPhone → Receipt Tracker → Exports
+export async function saveCsvToFilesApp(csv: string, date: string): Promise<string> {
+  const dir = `${FileSystem.documentDirectory}Exports/`;
+  await ensureDir(dir);
+  const dest = `${dir}receipts_${date}.csv`;
+  await FileSystem.writeAsStringAsync(dest, csv, { encoding: FileSystem.EncodingType.UTF8 });
+  return dest;
+}

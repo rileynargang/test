@@ -9,9 +9,7 @@ import {
   ScrollView,
   Linking,
 } from 'react-native';
-import * as Sharing from 'expo-sharing';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthRequest, AuthSessionResult } from 'expo-auth-session';
 
 import {
   useGoogleAuthRequest,
@@ -22,7 +20,7 @@ import {
 } from '../services/auth';
 import { getReceipts, getPendingSync } from '../services/database';
 import { syncPendingReceipts } from '../services/googleDrive';
-import { writeCsvToCache } from '../services/fileStorage';
+import { saveCsvToFilesApp } from '../services/fileStorage';
 import { Receipt, formatAmount } from '../types';
 
 export default function SettingsScreen() {
@@ -117,12 +115,12 @@ export default function SettingsScreen() {
         return;
       }
       const csv = generateCSV(receipts);
-      const filePath = await writeCsvToCache(csv, 'receipts_export.csv');
-      await Sharing.shareAsync(filePath, {
-        mimeType: 'text/csv',
-        dialogTitle: 'Export Receipts as CSV',
-        UTI: 'public.comma-separated-values-text',
-      });
+      const today = new Date().toISOString().slice(0, 10);
+      await saveCsvToFilesApp(csv, today);
+      Alert.alert(
+        'Saved to Files',
+        'Find it in Files → On My iPhone → Receipt Tracker → Exports'
+      );
     } catch {
       Alert.alert('Export Error', 'Could not export receipts.');
     } finally {
