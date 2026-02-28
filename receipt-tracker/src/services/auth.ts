@@ -33,7 +33,7 @@ export function getGoogleClientId(): string {
 }
 
 export function useGoogleAuthRequest() {
-  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  const redirectUri = 'https://auth.expo.io/@rileynargang/receipt-tracker';
   const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
